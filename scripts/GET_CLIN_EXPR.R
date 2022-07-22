@@ -2,14 +2,35 @@ library("IMvigor210CoreBiologies")
 library(data.table)
 library(biomaRt)
 
+args <- commandArgs(trailingOnly = TRUE)
+work_dir <- args[1]
+
 ##################################
 ## To load a CountDataSet
 data(cds)
 
 ##################################
 ## Get Clinical Data
+clin <- pData(cds)
+dup <- data.frame(table(clin$ANONPT_ID))
+dup <- dup[dup$Freq > 1, ]
 
-write.table(pData(cds),file="/data/Mariathasan/CLIN.txt",sep="\t",quote=F)
+for(dup_id in dup$Var1){
+  clin[clin$ANONPT_ID == dup_id, ]$ANONPT_ID <- unlist(
+    lapply(c(1:dup[dup$Var1 == dup_id, ]$Freq), function(num){
+      if(num - 1 > 0){
+        return(paste0(dup_id, '.', (num - 1)))
+      }else{
+        return(dup_id)
+      }
+      
+    })
+  )
+}
+
+clin$ANONPT_ID <- paste0('P', clin$ANONPT_ID)
+
+write.table(clin,file=file.path(work_dir, "CLIN.txt"),sep="\t",quote=F)
 
 ##################################
 ## Get Clinical Data
@@ -74,10 +95,12 @@ GetTPM <- function(counts,len) {
 }
 
 TPM = log2( GetTPM(data,size) + 1 )
-colnames(TPM) = pData(cds)[colnames(TPM),]$ANONPT_ID
+colnames(TPM) = paste0(clin[colnames(TPM),]$ANONPT_ID)
+TPM <- data.frame(TPM)
+TPM <- cbind(gene_id=rownames(TPM), TPM)
+gz <- gzfile(file.path(work_dir, 'EXPR.txt.gz'), "w")
+write.table( TPM , file=gz , quote=FALSE , sep="\t" , col.names=TRUE , row.names=FALSE )
+close(gz)
 
-write.table( TPM , file= "/data/Mariathasan/EXPR.txt" , quote=FALSE , sep=";" , col.names=TRUE , row.names=TRUE )
-system("gzip --force /data/Mariathasan/EXPR.txt > /data/Mariathasan/EXPR.txt.gz")
-
-
-
+# write.table( TPM , file= "/data/Mariathasan/EXPR.txt" , quote=FALSE , sep=";" , col.names=TRUE , row.names=TRUE )
+# system("gzip --force /data/Mariathasan/EXPR.txt > /data/Mariathasan/EXPR.txt.gz")

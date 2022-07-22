@@ -9,7 +9,7 @@ snv = as.data.frame( fread( file.path(input_dir, "SNV.txt.gz") , stringsAsFactor
 data = cbind( snv[ , c("patient" , "gene" ) ] , "Missense_Mutation" , NA , NA , NA , NA , NA )
 
 colnames(data) = c( "Sample" , "Gene" , "Effect" , "Pos" , "Chr", "Ref" , "Alt", "MutType" )
-data$Sample  = paste( "P" , data$Sample  , sep="" )
+# data$Sample  = paste( "P" , data$Sample  , sep="" )
 
 for( i in 1:nrow(snv)){
 	mut = snv$mutation[i]

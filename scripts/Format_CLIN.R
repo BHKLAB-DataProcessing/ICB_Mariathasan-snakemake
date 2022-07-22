@@ -13,8 +13,8 @@ colnames(clin) = c( "recist" , "sex" , "patient" , "t.os"  ,"os" , "primary" , "
 
 clin$recist[ clin$recist %in% "NE"] = NA
 clin$response = Get_Response( data=clin )
-clin$patient = paste( "P" , clin$patient , sep="" )
-clin_original$ANONPT_ID <- paste( "P" , clin_original$ANONPT_ID , sep="" )
+# clin$patient = paste( "P" , clin$patient , sep="" )
+# clin_original$ANONPT_ID <- paste( "P" , clin_original$ANONPT_ID , sep="" )
 
 case = read.csv( file.path(output_dir, "cased_sequenced.csv"), stringsAsFactors=FALSE , sep=";" )
 clin$rna[ clin$patient %in% case[ case$expr %in% 1 , ]$patient ] = "tpm"

@@ -8,7 +8,7 @@ expr = as.data.frame( fread( file.path(input_dir, "EXPR.txt.gz") , stringsAsFact
 rownames(expr) = expr[ , 1 ]
 expr = expr[ , -1 ]
 
-colnames(expr)  = paste( "P" , colnames(expr)  , sep="" )
+# colnames(expr)  = paste( "P" , colnames(expr)  , sep="" )
 
 case = read.csv( file.path(output_dir, "cased_sequenced.csv"), stringsAsFactors=FALSE , sep=";" )
 expr = expr[ , colnames(expr) %in% case[ case$expr %in% 1 , ]$patient ]

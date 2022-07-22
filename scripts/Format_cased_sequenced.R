@@ -5,17 +5,17 @@ input_dir <- args[1]
 output_dir <- args[2]
 
 clin = read.csv( file.path(input_dir, "CLIN.txt"), stringsAsFactors=FALSE , sep="\t" )
-rownames(clin) = paste0( 'P' , clin$ANONPT_ID )
+rownames(clin) = clin$ANONPT_ID
 
 
 ##################################
-rna = paste0( "P" , colnames( as.data.frame( fread( file.path(input_dir, "EXPR.txt.gz") , stringsAsFactors=FALSE  , sep="\t") ) )[-1] )
+rna = colnames( as.data.frame( fread( file.path(input_dir, "EXPR.txt.gz") , stringsAsFactors=FALSE  , sep="\t") ) )[-1]
 
 cna = as.data.frame( read.csv( file.path(input_dir, "CNA_gene.txt") , stringsAsFactors=FALSE , header=TRUE , sep="\t" ) )
-cna = as.character( sapply( colnames(cna) , function( x ) paste( "P" , unlist( strsplit( x , "X" , fixed=TRUE ) )[2] , sep="" ) ) )
+cna = colnames(cna)
 
 snv = as.data.frame( fread( file.path(input_dir, "SNV.txt.gz") , stringsAsFactors=FALSE , sep=";" ))
-snv = paste0( 'P' , sort( unique( snv[ , "patient" ] ) ) )
+snv = sort( unique( snv[ , "patient" ] ) )
 
 patient = rownames( clin )
 

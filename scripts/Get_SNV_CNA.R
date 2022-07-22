@@ -1,6 +1,9 @@
 library("IMvigor210CoreBiologies")
 library(data.table)
 
+args <- commandArgs(trailingOnly = TRUE)
+work_dir <- args[1]
+
 ##################################
 ## To load a Genomic alterations as assessed by FMOne panel (Foundation Medicine, Inc.)
 data(fmone)
@@ -23,17 +26,17 @@ for(i in 1:nrow(cna)){
 		if( ! deletion[i,j] %in% "" ){ cna[i,j] = -1 }
 	}
 }
-colnames(cna) = pData(fmone)[colnames(cna),]$ANONPT_ID
+colnames(cna) = paste0('P', pData(fmone)[colnames(cna),]$ANONPT_ID)
 
-write.table( cna , file= "/data/Mariathasan/CNA_gene.txt" , quote=FALSE , sep="\t" , col.names=TRUE , row.names=TRUE )
+write.table( cna , file= file.path(work_dir, "CNA_gene.txt") , quote=FALSE , sep="\t" , col.names=TRUE , row.names=TRUE )
 
 ##################################
 ## Get SNV
 
 known = assayDataElement(fmone, "known_short")
 likely = assayDataElement(fmone, "likely_short")
-colnames(known) = pData(fmone)[colnames(known),]$ANONPT_ID
-colnames(likely) = pData(fmone)[colnames(likely),]$ANONPT_ID
+colnames(known) = paste0('P', pData(fmone)[colnames(known),]$ANONPT_ID)
+colnames(likely) = paste0('P', pData(fmone)[colnames(likely),]$ANONPT_ID)
 
 snv = NULL
 for(i in 1:ncol(known)){
@@ -67,8 +70,10 @@ for(i in 1:ncol(likely)){
 colnames(snv) = c("patient","gene","mutation","type","vaf","coverage")
 snv = snv[order(snv[,1],snv[,2]),]
 
-write.table( snv , file= "/data/Mariathasan/SNV.txt" , quote=FALSE , sep=";" , col.names=TRUE , row.names=TRUE )
-system("gzip --force /data/Mariathasan/SNV.txt > /data/Mariathasan/SNV.txt.gz")
-
+gz <- gzfile(file.path(work_dir, 'SNV.txt.gz'), "w")
+write.table( snv , file=gz , quote=FALSE , sep=";" , col.names=TRUE , row.names=FALSE )
+close(gz)
+# write.table( snv , file= "/data/Mariathasan/SNV.txt" , quote=FALSE , sep=";" , col.names=TRUE , row.names=TRUE )
+# system("gzip --force /data/Mariathasan/SNV.txt > /data/Mariathasan/SNV.txt.gz")
 
 
