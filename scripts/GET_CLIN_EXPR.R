@@ -94,7 +94,7 @@ GetTPM <- function(counts,len) {
   return(t(t(x)*1e6/colSums(x)))
 }
 
-TPM = log2( GetTPM(data,size) + 1 )
+TPM = log2( GetTPM(data,size) + 0.001 )
 colnames(TPM) = paste0(clin[colnames(TPM),]$ANONPT_ID)
 TPM <- data.frame(TPM)
 TPM <- cbind(gene_id=rownames(TPM), TPM)
